@@ -1,4 +1,4 @@
-package info.jab.ms;
+package info.jab.ms.controller;
 
 import java.util.Collections;
 import java.util.HashMap;
