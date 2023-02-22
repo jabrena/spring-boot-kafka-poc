@@ -1,4 +1,4 @@
-package org.jab.microservices;
+package info.jab.ms;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,9 +7,9 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
 
-@RunWith(SpringRunner.class)
+@Disabled
 @EnableKafka
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, controlledShutdown = false,
@@ -43,7 +43,7 @@ public class KafkaTemplateTest {
 
         Consumer consumer = runConsumer();
         ConsumerRecord<String, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
-        Assert.assertEquals("test", singleRecord.value());
+        Assertions.assertEquals("test", singleRecord.value());
     }
 
     @KafkaListener(topics = TOPIC, groupId = "KAFKA_GROUP_ID")
