@@ -1,4 +1,4 @@
-package org.jab.microservices;;
+package info.jab.ms;;
 
 import java.util.HashMap;
 import java.util.Map;
