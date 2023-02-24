@@ -16,3 +16,7 @@ curl --json '{"message": "hello world"}' http://localhost:8080/api/v1/messages
 - https://docs.spring.io/spring-kafka/reference/html/
 - https://www.testcontainers.org/modules/kafka/
 - https://springdoc.org/v2/
+
+# Something to read for the future
+
+- https://codersee.com/how-to-set-up-kafka-without-zookeeper-using-docker-compose/
