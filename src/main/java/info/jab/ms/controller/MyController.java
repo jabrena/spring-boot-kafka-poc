@@ -2,25 +2,22 @@ package info.jab.ms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
-
 @RestController
+@RequestMapping("api/v1")
 public class MyController {
 
-	@Autowired
-    KafkaTemplate kafkaTemplate;
+    @Autowired
+    private KafkaTemplate<String,String> kafkaTemplate;
 
-	@GetMapping("/kafka")
-	public @ResponseBody
-    String getBook() {
-
-        kafkaTemplate.send(TOPIC, "test");
-
-		return "Hello World";
-	}
-
+    @PostMapping("/messages")
+    public MyRequest publish(@RequestBody MyRequest request){
+        kafkaTemplate.send("example_topic", request.message());
+        return request;
+    }
 }
+

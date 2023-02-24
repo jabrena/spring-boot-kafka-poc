@@ -1,76 +1,48 @@
 package info.jab.ms.controller;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
-import static org.assertj.core.api.Java6BDDAssertions.then;
-import static org.springframework.kafka.support.KafkaHeaders.TOPIC;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.BDDAssertions.then;
 
-
-@Disabled
-@EnableKafka
-@SpringBootTest
-@EmbeddedKafka(partitions = 1, controlledShutdown = false,
-        brokerProperties = {"listeners=PLAINTEXT://localhost:3333", "port=3333"})
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EmbeddedKafka(
+        partitions = 1,
+        controlledShutdown = true,
+        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@TestPropertySource(properties = "spring.kafka.bootstrap-servers=localhost:9092")
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 public class MyControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @LocalServerPort
+    private int port;
 
     @Autowired
-    EmbeddedKafkaBroker embeddedKafkaBroker;
+    private TestRestTemplate restTemplate;
 
     @Test
-    public void testConfig() throws Exception {
+    public void shouldSendMessageToKafka() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/kafka")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-                .andReturn();
+        //Given
+        String address = "http://localhost:" + port + "/api/v1/messages";
 
-        then(mvcResult.getResponse().getContentAsString()).isEqualTo("Hello World");
+        //When
+        MyRequest payload = new MyRequest("Hello World");
 
-        Consumer consumer = runConsumer();
-        ConsumerRecord<String, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
-        Assertions.assertEquals("test", singleRecord.value());
-    }
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<MyRequest> request = new HttpEntity<>(payload, headers);
+        ResponseEntity<MyRequest> result = this.restTemplate.postForEntity(address, request, MyRequest.class);
 
-    @KafkaListener(topics = TOPIC, groupId = "KAFKA_GROUP_ID")
-    public void listen(String message) {
-        System.out.println("TESTReceived Messasge in group KAFKA_GROUP_ID: " + message);
-    }
-
-    public Consumer runConsumer(){
-        Map<String, Object> configs = new HashMap<>(KafkaTestUtils.consumerProps("consumer", "false", embeddedKafkaBroker));
-        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        Consumer<String, String> consumer = new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), new StringDeserializer()).createConsumer();
-        consumer.subscribe(Collections.singleton(TOPIC));
-        return consumer;
+        //Then
+        then(result.getBody().message()).isEqualTo("Hello World");
     }
 }
