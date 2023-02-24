@@ -1,30 +1,21 @@
 package info.jab.ms;
 
-import org.junit.jupiter.api.Disabled;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
-@Testcontainers
 @SpringBootTest
+@EmbeddedKafka(
+		partitions = 1,
+		controlledShutdown = true,
+		brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@TestPropertySource(properties = "spring.kafka.bootstrap-servers=localhost:9092")
+@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 public class MainApplicationTests {
-
-	@Container
-	static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"));
-
-	@DynamicPropertySource
-	static void props(DynamicPropertyRegistry registry) {
-		registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
-	}
 
 	@Test
 	public void contextLoads() {
 	}
-
 }
