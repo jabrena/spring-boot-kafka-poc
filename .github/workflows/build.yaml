@@ -24,4 +24,13 @@ jobs:
 
       - name: Maven Verify
         run: |
-          ./mvnw --batch-mode --no-transfer-progress -B verify
+          ./mvnw --batch-mode --no-transfer-progress -B package
+
+      - name: Docker compose
+        run: |
+          docker compose up --build -d
+          sleep 30
+          curl -X POST http://localhost:8080/api/v1/messages \
+          -H 'Content-Type: application/json' \
+          -d '{"message" : "hello world"}'
+          docker-compose stop

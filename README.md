@@ -2,11 +2,14 @@
 
 [![CI Builds](https://github.com/jabrena/spring-boot-kafka-poc/actions/workflows/build.yaml/badge.svg)](https://github.com/jabrena/spring-boot-kafka-poc/actions/workflows/build.yaml)
 
+## How to build?
+
 ```
 mvn clean package
-
 docker compose up --build
-docker compose logs kafka-example --follow
+
+docker compose logs producer --follow
+docker compose logs consumer --follow
 http://localhost:8080/swagger-ui/index.html
 curl --json '{"message": "hello world"}' http://localhost:8080/api/v1/messages
 ```
