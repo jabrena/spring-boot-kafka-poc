@@ -1,17 +1,20 @@
 package info.jab.ms.controller;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-
 import static org.assertj.core.api.BDDAssertions.then;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,6 +31,15 @@ public class MyControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @TestConfiguration
+    static class config {
+
+        @Bean
+        public NewTopic Code_topic(){
+            return TopicBuilder.name("example_topic2").build();
+        }
+    }
 
     @Test
     public void shouldSendMessageToKafka() throws Exception {
