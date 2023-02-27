@@ -28,7 +28,7 @@ jobs:
 
       - name: Docker compose
         run: |
-          docker compose up --build
-          sleep 50
+          docker compose up --build -d
+          sleep 30
           curl --json '{"message": "hello world"}' http://localhost:8080/api/v1/messages
           docker-compose stop
