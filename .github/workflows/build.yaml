@@ -24,4 +24,8 @@ jobs:
 
       - name: Maven Verify
         run: |
-          ./mvnw --batch-mode --no-transfer-progress -B verify
+          ./mvnw --batch-mode --no-transfer-progress -B package
+
+      - name: Docker compose
+        run: |
+          docker compose up --build
