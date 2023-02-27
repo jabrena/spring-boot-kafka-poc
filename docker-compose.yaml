@@ -25,8 +25,8 @@ services:
     depends_on:
       - zookeeper
 
-  kafka-example:
-    build: .
+  producer:
+    build: ./producer
     ports:
       - "8080:8080"
     environment:

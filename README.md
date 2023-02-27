@@ -4,15 +4,16 @@
 
 ```
 mvn clean package
-http://localhost:8080/swagger-ui/index.html
 
 docker compose up --build
 docker compose logs kafka-example --follow
+http://localhost:8080/swagger-ui/index.html
 curl --json '{"message": "hello world"}' http://localhost:8080/api/v1/messages
 ```
 
 # References
 
+- https://kafka.apache.org/documentation/
 - https://docs.spring.io/spring-kafka/reference/html/
 - https://www.testcontainers.org/modules/kafka/
 - https://springdoc.org/v2/
