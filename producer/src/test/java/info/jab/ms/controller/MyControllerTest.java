@@ -1,5 +1,6 @@
 package info.jab.ms.controller;
 
+import info.jab.ms.config.KafkaCommons;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ import static org.assertj.core.api.BDDAssertions.then;
 @EmbeddedKafka(
         partitions = 1,
         controlledShutdown = true,
-        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" },
+        topics = { KafkaCommons.COMMON_TOPIC })
 @TestPropertySource(properties = "spring.kafka.bootstrap-servers=localhost:9092")
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 public class MyControllerTest {
@@ -31,15 +33,6 @@ public class MyControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @TestConfiguration
-    static class config {
-
-        @Bean
-        public NewTopic Code_topic(){
-            return TopicBuilder.name("example_topic2").build();
-        }
-    }
 
     @Test
     public void shouldSendMessageToKafka() throws Exception {
