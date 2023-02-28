@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
 })
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserKafkaConsumerTest {
+class MyKafkaListenerTest {
 
     @SpyBean
     private MyKafkaListener userKafkaConsumer;
@@ -59,7 +59,7 @@ class UserKafkaConsumerTest {
     }
 
     @Test
-    void testLogKafkaMessages() {
+    void should_reach_listener_when_i_send_a_message() {
 
         //Given
         String expectedMessage = "Hello World";
