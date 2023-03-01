@@ -22,10 +22,15 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.BDDAssertions.then;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+
+import net.datafaker.Faker;
 
 @SpringBootTest
 @EmbeddedKafka(
@@ -40,6 +45,9 @@ import static org.mockito.Mockito.verify;
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MyKafkaListenerTest {
+
+    @Autowired
+    private FakeRepository fakeRepository;
 
     @SpyBean
     private MyKafkaListener userKafkaConsumer;
@@ -73,6 +81,28 @@ class MyKafkaListenerTest {
 
         //Then
         then(result).isEqualTo(expectedMessage);
+    }
+
+    @Test
+    void should_listener_store_all_messages() throws Exception {
+
+        //Given
+        Faker faker = new Faker();
+        var expectedMessages = IntStream
+                .rangeClosed(1,5).boxed()
+                .map(i -> faker.food().fruit()).toList();
+
+        expectedMessages.forEach(f ->
+                producer.send(new ProducerRecord<>(KafkaCommons.COMMON_TOPIC, f)));
+        producer.flush();
+
+        //When
+        await().atMost(5, SECONDS)
+                .until(() -> fakeRepository.findAll().size() >= 0);
+        var result = fakeRepository.findAll();
+
+        //Then
+        then(result).isEqualTo(expectedMessages);
     }
 
     @AfterAll
