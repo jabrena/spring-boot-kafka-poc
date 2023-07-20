@@ -12,6 +12,11 @@ docker compose logs producer --follow
 docker compose logs consumer --follow
 http://localhost:8080/swagger-ui/index.html
 curl --json '{"message": "hello world"}' http://localhost:8080/api/v1/messages
+
+curl -X POST http://localhost:8080/api/v1/messages \
+   -H 'Content-Type: application/json' \
+   -d '{"message": "hello world"}'
+
 ```
 
 # References
