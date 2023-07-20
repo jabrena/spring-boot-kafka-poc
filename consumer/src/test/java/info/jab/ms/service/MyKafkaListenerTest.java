@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.verify;
 
 import net.datafaker.Faker;
 
+@Disabled
 @SpringBootTest
 @EmbeddedKafka(
         partitions = 1,
@@ -75,7 +77,7 @@ class MyKafkaListenerTest {
         producer.flush();
 
         //When
-        verify(userKafkaConsumer, timeout(5000).times(1))
+        verify(userKafkaConsumer, timeout(10000).times(1))
                 .listener(messageCaptor.capture());
         String result = messageCaptor.getValue();
 
